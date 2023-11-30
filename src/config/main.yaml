@@ -1,0 +1,21 @@
+pins:
+  up_left:      16
+  up_right:     11
+  down_left:    22
+  down_right:   15
+  freeze_left:  18 
+  freeze_right: 13
+
+
+schedule:
+  - name: 'both blinds freeze'
+    job: 'both_blinds_freeze'
+    runtime: '07:50:00'
+
+  - name: 'both blinds down'
+    job: 'both_blinds_down'
+    runtime: '16:30:00'
+
+  - name: 'both blinds freeze'
+    job: 'both_blinds_freeze'
+    runtime: '09:00:00'
