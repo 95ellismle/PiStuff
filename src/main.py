@@ -14,8 +14,9 @@ logging.basicConfig(filename='blinds.log',
 
 if __name__ == '__main__':
     log.info("Setting up")
+    GPIO.setmode(GPIO.BOARD)
+
     try:
-        GPIO.setmode(GPIO.BOARD)
         SCHEDULE, CONFIG = get_config()
         SCHEDULE.run()
     finally:

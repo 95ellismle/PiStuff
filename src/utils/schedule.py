@@ -69,11 +69,12 @@ class Scheduler:
                 continue
 
             sleep_time = self._get_sleep_time_to(next_job)
-            log.info(f"Sleeping for {sleep_time}s")
+            runtime = datetime.now(UTC) + timedelta(seconds=sleep_time)
+            log.info(f"Sleeping for {sleep_time}s (next run at {runtime:%Y/%m/%d %H:%M:%S})")
             sleep(sleep_time)
 
             kwargs = next_job.kwargs or {}
-            log.info(f"Running job {job.__name__} with args: {args} and kwargs: {kwargs}")
+            log.info(f"Running job {next_job} with args: {args} and kwargs: {kwargs}")
             next_job.job(*next_job.args, **kwargs)
 
             sleep(1)  # make sure we don't get the same job twice
