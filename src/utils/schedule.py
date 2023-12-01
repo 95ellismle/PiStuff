@@ -74,7 +74,7 @@ class Scheduler:
             sleep(sleep_time)
 
             kwargs = next_job.kwargs or {}
-            log.info(f"Running job {next_job} with args: {args} and kwargs: {kwargs}")
+            log.info(f"Running job {next_job} with args: {next_job.args} and kwargs: {kwargs}")
             next_job.job(*next_job.args, **kwargs)
 
             sleep(1)  # make sure we don't get the same job twice

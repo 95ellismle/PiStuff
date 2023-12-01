@@ -28,7 +28,8 @@ def get_config():
 
         job = Job(name=job_details['name'],
                   runtime=runtime,
-                  job=job)
+                  job=job,
+                  kwargs={'config': config})
         SCHEDULE.add_job(job)
 
 
