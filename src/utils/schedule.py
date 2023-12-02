@@ -1,21 +1,50 @@
 from typing import Any, Callable
 from datetime import datetime, time, timedelta, UTC
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 import logging
+import suntime
 from time import sleep
 
 log = logging.getLogger(__name__)
+SUN: suntime.Sun | None = None
+
+
+def set_sun_lat_lon(latitude: float, longitude: float):
+    global SUN
+    if SUN is None:
+        SUN = suntime.Sun(latitude, longitude)
 
 
 @dataclass
 class Job:
-    runtime: time
     job: Callable
     name: str
+    runtime: time
     id_: int | None = None
     args: tuple[Any] = ()
     kwargs: dict[str, Any] | None = None
 
+    def _parse_time(self, time_str: str|time):
+        if isinstance(time_str, time):
+            return time_str
+
+        elif 'sunset' in time_str:
+            return SUN.get_local_sunset_time()
+
+        elif 'sunrise' in time_str:
+            return SUN.get_local_sunrise_time()
+
+        else:
+            t = time(*map(int, time_str.split(':')))
+            self.runtime = t
+            return t
+
+    def __getattribute__(self, name: str):
+        val = object.__getattribute__(self, name)
+        if name == 'runtime':
+            return self._parse_time(val)
+        else:
+            return val
 
 
 class Scheduler:

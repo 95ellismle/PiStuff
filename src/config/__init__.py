@@ -5,7 +5,7 @@ import yaml
 
 from utils import jobs
 from utils.pins import PinOut
-from utils.schedule import Scheduler, Job
+from utils.schedule import Scheduler, Job, set_sun_lat_lon
 
 CONFIG_ROOT = Path(__file__).parent
 SCHEDULE = Scheduler()
@@ -21,13 +21,19 @@ def get_config():
     for pin_name, pin_num in config.get('pins', {}).items():
         config['pins'][pin_name] = PinOut(pin_num, pin_name)
 
+    # Settings
+    settings = config['settings']
+    latitude = settings.get('latitude')
+    longitude = settings.get('longitude')
+    if latitude and longitude:
+        set_sun_lat_lon(latitude, longitude)
+
+
     # Setup schedule
     for job_details in config.get('schedule', {}):
-        runtime: time = time(*(int(i) for i in job_details['runtime'].split(':')))
         job: Callable = getattr(jobs, job_details['job'])
-
         job = Job(name=job_details['name'],
-                  runtime=runtime,
+                  runtime=job_details['runtime'],
                   job=job)
         SCHEDULE.add_job(job)
 
