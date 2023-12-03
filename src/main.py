@@ -4,6 +4,7 @@ from datetime import datetime, time, timedelta
 import logging
 import yaml
 
+from utils.schedule import Scheduler
 from config import CONFIG_ROOT
 from config.config import get_config
 
@@ -20,6 +21,6 @@ if __name__ == '__main__':
     schedule = Scheduler()
     try:
         config = get_config(CONFIG_ROOT / 'main.yaml', schedule)
-        SCHEDULE.run()
+        schedule.run()
     finally:
        GPIO.cleanup()
