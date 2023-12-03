@@ -6,6 +6,9 @@ pins:
   freeze_left:  18 
   freeze_right: 13
 
+settings:
+  latitude: 51.5
+  longitude: -0.12
 
 schedule:
   - name: 'both blinds freeze'
@@ -14,7 +17,7 @@ schedule:
 
   - name: 'both blinds down'
     job: 'both_blinds_down'
-    runtime: '16:30:00'
+    runtime: 'sunset'
 
   - name: 'both blinds freeze'
     job: 'both_blinds_freeze'

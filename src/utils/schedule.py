@@ -1,5 +1,5 @@
 from typing import Any, Callable
-from datetime import datetime, time, timedelta, UTC
+from datetime import datetime, time, timedelta
 from dataclasses import dataclass, field
 import logging
 import suntime
@@ -15,11 +15,16 @@ def set_sun_lat_lon(latitude: float, longitude: float):
         SUN = suntime.Sun(latitude, longitude)
 
 
+def get_sun():
+    global SUN
+    return SUN
+
+
 @dataclass
 class Job:
-    job: Callable
-    name: str
     runtime: time
+    job: Callable | None = None
+    name: str = 'NO NAME'
     id_: int | None = None
     args: tuple[Any] = ()
     kwargs: dict[str, Any] | None = None
@@ -29,10 +34,10 @@ class Job:
             return time_str
 
         elif 'sunset' in time_str:
-            return SUN.get_local_sunset_time()
+            return SUN.get_local_sunset_time().time()
 
         elif 'sunrise' in time_str:
-            return SUN.get_local_sunrise_time()
+            return SUN.get_local_sunrise_time().time()
 
         else:
             t = time(*map(int, time_str.split(':')))
@@ -48,8 +53,8 @@ class Job:
 
 
 class Scheduler:
-    _jobs: list[Job]
-    _last_proc_id: int
+    _jobs: list[Job]  # The jobs we run
+    _last_proc_id: int  # An incrementor for setting proc ID
 
     def __init__(self):
         self._jobs = []
@@ -61,7 +66,7 @@ class Scheduler:
             return
 
         if m_time is None:
-            m_time = datetime.now(UTC).time()
+            m_time = datetime.now().time()
 
         ind = self.find_schedule_index(m_time)
         if ind < len(self._jobs) and self._jobs[ind].runtime == m_time:
@@ -76,9 +81,9 @@ class Scheduler:
     def _get_sleep_time_to(self, next_job: Job, m_time: time|None = None):
         """How long should we sleep to get from m_time -> job.runtime"""
         if m_time is None:
-            m_time = datetime.now(UTC).time()
+            m_time = datetime.now().time()
 
-        run_date = datetime.now(UTC).date()
+        run_date = datetime.now().date()
         current_datetime = datetime.combine(run_date, m_time)
         if next_job.runtime < m_time:
             run_date += timedelta(days=1)
@@ -98,11 +103,12 @@ class Scheduler:
                 continue
 
             sleep_time = self._get_sleep_time_to(next_job)
-            log.info(f"Sleeping for {sleep_time}s")
+            runtime = datetime.now() + timedelta(seconds=sleep_time)
+            log.info(f"Sleeping for {sleep_time}s (next run at {runtime:%Y/%m/%d %H:%M:%S})")
             sleep(sleep_time)
 
             kwargs = next_job.kwargs or {}
-            log.info(f"Running job {job.__name__} with args: {args} and kwargs: {kwargs}")
+            log.info(f"Running job {next_job} with args: {next_job.args} and kwargs: {kwargs}")
             next_job.job(*next_job.args, **kwargs)
 
             sleep(1)  # make sure we don't get the same job twice
@@ -142,6 +148,9 @@ class Scheduler:
 
         return st
 
+    def refresh_order(self):
+        """If sunrise and sunset are used then we should refresh these times at the start of the day"""
+        self._jobs.sort(key=lambda i: i.runtime)
 
     def add_job(self, job: Job):
         """Add a job to the schedule"""

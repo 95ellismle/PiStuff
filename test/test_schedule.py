@@ -1,7 +1,8 @@
-from src.utils.schedule import Scheduler, Job, set_sun_lat_lon
 import suntime
 from datetime import time, datetime
 import pytest
+
+from utils.schedule import Scheduler, Job, set_sun_lat_lon
 
 SUN = suntime.Sun(50, 20)
 set_sun_lat_lon(50, 20)
@@ -11,8 +12,8 @@ set_sun_lat_lon(50, 20)
         [("07", time(hour=7)),
          ("07:30", time(hour=7, minute=30)),
          ("07:30:01", time(hour=7, minute=30, second=1)),
-         ("sunset", SUN.get_local_sunset_time()),
-         ("sunrise", SUN.get_local_sunrise_time()),
+         ("sunset", SUN.get_local_sunset_time().time()),
+         ("sunrise", SUN.get_local_sunrise_time().time()),
 ])
 def test_job_parse_time(time_str, expectation):
     job = Job(name='bob', runtime=time_str, job=lambda i: i)
@@ -118,3 +119,17 @@ def test_get_sleep_time_to(test_time, num_seconds):
     assert sleep_time == num_seconds
 
 
+def test_refresh_schedule():
+    job = Job(runtime='7')
+    job2 = Job(runtime='8')
+    job3 = Job(runtime='9')
+
+    scheduler = Scheduler()
+    scheduler._jobs = [job2, job3, job]
+    assert scheduler._jobs[0].runtime < scheduler._jobs[1].runtime
+    assert scheduler._jobs[1].runtime > scheduler._jobs[2].runtime
+
+    scheduler.refresh_order()
+
+    assert scheduler._jobs[0].runtime < scheduler._jobs[1].runtime
+    assert scheduler._jobs[1].runtime < scheduler._jobs[2].runtime
