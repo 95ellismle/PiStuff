@@ -1,9 +1,9 @@
 pins:
-  up_left:      16
+  up_left:      18
   up_right:     11
   down_left:    22
   down_right:   15
-  freeze_left:  18 
+  freeze_left:  16 
   freeze_right: 13
 
 settings:
