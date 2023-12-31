@@ -80,21 +80,28 @@ class Scheduler:
 
         return self._jobs[ind]
 
-    def _get_sleep_time_to(self, next_job: Job, m_time: time|None = None):
+    def _get_sleep_time_to(self,
+                           next_job: Job,
+                           m_time: time|None = None,
+                           m_date: date|None = None):
         """How long should we sleep to get from m_time -> job.runtime
 
         Args:
             next_job: The next job to run
             m_time: The current time (optional). Mostly useful for testing.
+            m_date: The current date (optional). Mostly useful for testing.
         """
         if m_time is None:
             m_time = datetime.now().time()
 
         run_date = datetime.now().date()
+        if m_date is not None:
+            run_date = m_date
+
         current_datetime = datetime.combine(run_date, m_time)
         if next_job.runtime < m_time:
             run_date += timedelta(days=1)
-        
+
         # Skip any required dates
         while run_date in self.dates_to_skip:
             run_date += timedelta(days=1)

@@ -28,12 +28,16 @@ def get_config(yaml_file: Path, schedule: Scheduler | None = None):
     if schedule:
         add_refresh_job = False
         skip_dates = set()
-        if 'skip_dates' in schedule:
-            skip_dates = set(schedule['skip_dates'])
-            schedule.pop('skip_dates')
+        if 'skip_dates' in config.get('schedule', []):
+            skip_dates = set(config['schedule']['skip_dates'])
+            config['schedule'].pop('skip_dates')
             schedule.add_skip_dates(skip_dates)
 
-        for job_details in config.get('schedule', []):
+        for job_details in config.get('schedule', {}).get('jobs', []):
+            if any(j not in job_details for j in ('job', 'name', 'runtime')):
+                print(f"BAD CONFIG: {job_details}")
+                continue
+
             if job_details['job'] is None:
                 job = lambda i: None
             else:

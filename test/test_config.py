@@ -1,3 +1,4 @@
+from datetime import datetime
 import tempfile
 import pytest
 
@@ -6,7 +7,7 @@ from config.config import get_config
 
 
 
-@pytest.fixture()
+@pytest.fixture(scope='function')
 def scheduler():
     return Scheduler()
 
@@ -18,6 +19,23 @@ def sun():
     return sun
 
 
+def test_skip_dates(scheduler):
+    config_str = b"""
+    schedule:
+        skip_dates:
+          - "2023-01-01"
+
+        jobs:
+          - name: "bob"
+            job:
+            runtime: "07:00:00"
+    """
+    with tempfile.NamedTemporaryFile() as fp:
+        fp.write(config_str)
+        fp.flush()
+        config = get_config(fp.name, scheduler)
+        assert scheduler.dates_to_skip == {datetime.strptime('2023-01-01', '%Y-%m-%d').date()}
+
 def test_get_config_sunset_sunrise(scheduler, sun):
     config_str = b"""
 settings:
@@ -25,13 +43,14 @@ settings:
     longitude: 0
 
 schedule:
-    - name: bob
-      runtime: sunset
-      job: null
+    jobs:
+       - name: bob
+         runtime: sunset
+         job: null
 
-    - name: bob1
-      runtime: sunrise
-      job: null
+       - name: bob1
+         runtime: sunrise
+         job: null
     """
     with tempfile.NamedTemporaryFile() as fp:
         fp.write(config_str)

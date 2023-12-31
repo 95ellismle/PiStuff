@@ -11,16 +11,17 @@ settings:
   longitude: -0.12
 
 schedule:
-  - skip_dates: 
+  skip_dates: 
     - "2023-01-01"
-  - name: 'both blinds freeze'
-    job: 'both_blinds_freeze'
-    runtime: '07:50:00'
+  jobs:
+    - name: 'both blinds freeze'
+      job: 'both_blinds_freeze'
+      runtime: '07:50:00'
 
-  - name: 'both blinds down'
-    job: 'both_blinds_down'
-    runtime: 'sunset'
+    - name: 'both blinds down'
+      job: 'both_blinds_down'
+      runtime: 'sunset'
 
-  - name: 'both blinds up'
-    job: 'both_blinds_up'
-    runtime: '09:00:00'
+    - name: 'both blinds up'
+      job: 'both_blinds_up'
+      runtime: '09:00:00'

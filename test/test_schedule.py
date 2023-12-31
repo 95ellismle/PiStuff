@@ -1,3 +1,4 @@
+from datetime import date
 import suntime
 from datetime import time, datetime
 import pytest
@@ -117,6 +118,24 @@ def test_get_sleep_time_to(test_time, num_seconds):
                     m_time=time(17, 0)
     )
     assert sleep_time == num_seconds
+
+
+def test_skip_dates():
+    func = lambda i: i
+    scheduler = Scheduler()
+
+    scheduler.add_skip_dates({'2023-01-01'})
+
+    test_time = '07:00'
+    sleep_time = scheduler._get_sleep_time_to(
+            Job(runtime=test_time,
+                name='bob',
+                job=func),
+            m_time=time(17,0),
+            m_date=date(2022,12,31),
+    )
+
+    assert sleep_time == ((14 + 24) * 3600)
 
 
 def test_refresh_schedule():
