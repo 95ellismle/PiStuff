@@ -1,5 +1,5 @@
 from typing import Any, Callable
-from datetime import datetime, time, timedelta
+from datetime import datetime, time, timedelta, date
 from dataclasses import dataclass, field
 import logging
 import suntime
@@ -55,10 +55,12 @@ class Job:
 class Scheduler:
     _jobs: list[Job]  # The jobs we run
     _last_proc_id: int  # An incrementor for setting proc ID
+    dates_to_skip: set[date]  # Any dates that should be skipped
 
     def __init__(self):
         self._jobs = []
         self._last_proc_id = -1
+        self.dates_to_skip = set()
 
     def _get_next_job(self, m_time: time | None = None) -> Job | None:
         """Get the next job to be run (default from now)"""
@@ -79,7 +81,12 @@ class Scheduler:
         return self._jobs[ind]
 
     def _get_sleep_time_to(self, next_job: Job, m_time: time|None = None):
-        """How long should we sleep to get from m_time -> job.runtime"""
+        """How long should we sleep to get from m_time -> job.runtime
+
+        Args:
+            next_job: The next job to run
+            m_time: The current time (optional). Mostly useful for testing.
+        """
         if m_time is None:
             m_time = datetime.now().time()
 
@@ -87,6 +94,11 @@ class Scheduler:
         current_datetime = datetime.combine(run_date, m_time)
         if next_job.runtime < m_time:
             run_date += timedelta(days=1)
+        
+        # Skip any required dates
+        while run_date in self.dates_to_skip:
+            run_date += timedelta(days=1)
+
         run_datetime = datetime.combine(run_date, next_job.runtime)
 
         assert run_datetime > current_datetime, "Something has gone wrong with the schedule. The next run datetime should always be more than that current datetime"
@@ -147,6 +159,11 @@ class Scheduler:
                     return ed + 1
 
         return st
+
+    def add_skip_dates(self, skip_dates: set[str]):
+        """Add dates to skip to scheduler"""
+        for m_date in skip_dates:
+            self.dates_to_skip.add(datetime.strptime(m_date, '%Y-%m-%d').date())
 
     def refresh_order(self):
         """If sunrise and sunset are used then we should refresh these times at the start of the day"""

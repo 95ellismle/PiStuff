@@ -10,16 +10,19 @@ class PinOut:
    _name: str  = None
    _state: int = None
    _schedules: list["Job"] = None
+   _init_done_: bool = False
 
    def __init__(self, pin_num: int, name: str = None):
       self.num = pin_num
+      self._name = pin_num if name is None else name
+
+      if self._init_done_ is False:
+          GPIO.setmode(GPIO.BOARD)
+          self._init_done_ = True
+
       GPIO.setup(pin_num, GPIO.OUT)
       self.off()
       self._schedules = []
-      if name is not None:
-         self._name = name
-      else:
-         self._name = pin_num
 
    def add_schedule(self, daily_schedule: "Job"):
       self._schedules.append(daily_schedule)
