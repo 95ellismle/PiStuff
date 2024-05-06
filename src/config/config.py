@@ -56,7 +56,8 @@ def get_config(yaml_file: Path, schedule: Scheduler | None = None):
             schedule.add_job(
                     Job(name='Refresh schedule order (for sunrise/sunset)',
                         job=lambda config: schedule.refresh_order(),
-                        runtime='00:08:03')
+                        runtime='00:08:03',
+                        kwargs={'config': config})
             )
 
     return config

@@ -16,7 +16,7 @@ schedule:
   jobs:
     - name: 'both blinds freeze'
       job: 'both_blinds_freeze'
-      runtime: '07:50:00'
+      runtime: '07:30:00'
 
     - name: 'both blinds down'
       job: 'both_blinds_down'
