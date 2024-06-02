@@ -19,6 +19,29 @@ def sun():
     return sun
 
 
+def test_weather_condition(scheduler):
+    config_str = b"""
+    schedule:
+        jobs:
+          - name: "weather_condition"
+            job:
+            runtime: "07:00:00"
+            condition:
+              - type: weather
+                kind: "sunny"
+                temp:
+                    op: ">="
+                    val: 15
+    """
+    with tempfile.NamedTemporaryFile() as fp:
+        fp.write(config_str)
+        fp.flush()
+        config = get_config(fp.name, scheduler)
+        assert len(scheduler._jobs) == 1
+        next_job = scheduler._get_next_job()
+        assert next_job.condition_func is not None
+
+
 def test_skip_dates(scheduler):
     config_str = b"""
     schedule:
@@ -35,6 +58,7 @@ def test_skip_dates(scheduler):
         fp.flush()
         config = get_config(fp.name, scheduler)
         assert scheduler.dates_to_skip == {datetime.strptime('2023-01-01', '%Y-%m-%d').date()}
+
 
 def test_get_config_sunset_sunrise(scheduler, sun):
     config_str = b"""

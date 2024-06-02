@@ -24,6 +24,7 @@ def get_sun():
 class Job:
     runtime: time
     job: Callable | None = None
+    condition_func: Callable | None = None
     name: str = 'NO NAME'
     id_: int | None = None
     args: tuple[Any] = ()
@@ -128,7 +129,15 @@ class Scheduler:
 
             kwargs = next_job.kwargs or {}
             log.info(f"Running job {next_job} with args: {next_job.args} and kwargs: {kwargs}")
-            next_job.job(*next_job.args, **kwargs)
+            should_run_job = True
+            if next_job.condition_func is not None:
+                try:
+                    should_run_job = next_job.condition_func()
+                except:
+                    log.info(f"Condition func {should_run_job} failed :(")
+
+            if should_run_job:
+                next_job.job(*next_job.args, **kwargs)
 
             sleep(1)  # make sure we don't get the same job twice
 

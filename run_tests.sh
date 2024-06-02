@@ -1,2 +1,2 @@
-. env/bin/activate
-PYTHONPATH="$(pwd)/src" pytest $1 
+. venv/bin/activate
+IS_DEV=1 PYTHONPATH="$(pwd)/src" pytest "$@"

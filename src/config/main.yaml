@@ -3,7 +3,7 @@ pins:
   up_right:     11
   down_left:    22
   down_right:   15
-  freeze_left:  16 
+  freeze_left:  16
   freeze_right: 13
 
 settings:
@@ -11,16 +11,26 @@ settings:
   longitude: -0.12
 
 schedule:
-  skip_dates: 
+  skip_dates:
     - "2023-01-01"
   jobs:
     - name: 'both blinds freeze'
       job: 'both_blinds_freeze'
       runtime: '07:30:00'
 
-    - name: 'both blinds down heat'
-      job: 'both_blinds_down'
+    - name: 'both blinds partially down heat'
+      job: 'both_blinds_freeze'
       runtime: '14:55:00'
+      conditions:
+        - type: weather
+          kind: "sunny"
+          temperature:
+            op: ">="
+            value: 15
+
+    - name: 'both blinds down sleep'
+      job: 'both_blinds_down'
+      runtime: '18:00:00'
 
     - name: 'both blinds up'
       job: 'both_blinds_up'
