@@ -18,9 +18,9 @@ schedule:
       job: 'both_blinds_freeze'
       runtime: '07:30:00'
 
-    - name: 'both blinds down'
+    - name: 'both blinds down heat'
       job: 'both_blinds_down'
-      runtime: 'sunset'
+      runtime: '14:55:00'
 
     - name: 'both blinds up'
       job: 'both_blinds_up'
