@@ -133,8 +133,8 @@ class Scheduler:
             if next_job.condition_func is not None:
                 try:
                     should_run_job = next_job.condition_func()
-                except:
-                    log.info(f"Condition func {should_run_job} failed :(")
+                except Exception as e:
+                    log.info(f"Condition func {should_run_job} failed :( {str(e)}", exc_info=True)
 
             if should_run_job:
                 next_job.job(*next_job.args, **kwargs)

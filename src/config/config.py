@@ -5,6 +5,7 @@ import os
 from datetime import date, time, timedelta
 from pathlib import Path
 from typing import Callable
+import logging
 import os
 import yaml
 
@@ -12,6 +13,8 @@ from utils import jobs, conditions
 if not os.environ.get('IS_DEV', False):
     from utils.pins import PinOut
 from utils.schedule import Scheduler, Job, set_sun_lat_lon
+
+log = logging.getLogger(__name__)
 
 
 def get_config(yaml_file: Path, schedule: Scheduler | None = None):
@@ -53,9 +56,15 @@ def get_config(yaml_file: Path, schedule: Scheduler | None = None):
             if 'sunset' in job_details['runtime'] or 'sunrise' in job_details['runtime']:
                 add_refresh_job = True
 
+            log.info(f"Adding job: {job_details['name']}" + "\n" +
+                     f"  runtime: {job_details['runtime']}" + "\n" +
+                     f"  condition: {job_details.get('conditions')}" + "\n" +
+                     f"  job: {job}" + "\n" +
+                     f"  config: {config}" + "\n")
+
             job = Job(name=job_details['name'],
                       runtime=job_details['runtime'],
-                      condition_func=conditions.get_condition_func(job_details.get('condition', None)),
+                      condition_func=conditions.get_condition_func(job_details.get('conditions', None)),
                       job=job,
                       kwargs={'config': config})
             schedule.add_job(job)

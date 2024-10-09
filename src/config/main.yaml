@@ -25,12 +25,30 @@ schedule:
         - type: weather
           kind: "sunny"
           temperature:
-            op: ">="
+            operation: ">="
             value: 16
+
+    - name: 'both blinds partially down test'
+      job: 'both_blinds_down'
+      runtime: '10:48:00'
+      conditions:
+        - type: weather
+          temperature:
+            operation: ">="
+            value: 24
+
+    - name: 'both blinds partially down high heat'
+      job: 'both_blinds_down'
+      runtime: '15:00:00'
+      conditions:
+        - type: weather
+          temperature:
+            operation: ">="
+            value: 24
 
     - name: 'both blinds down sleep'
       job: 'both_blinds_down'
-      runtime: '18:00:00'
+      runtime: 'sunset'
 
     - name: 'both blinds up'
       job: 'both_blinds_up'
