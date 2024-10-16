@@ -54,7 +54,7 @@ def weather_condition(condition):
             operation = value['operation']
             comparator = value['value']
             temp = weather.temperature
-            log.info(f"Weather temperature = {temp}, operation: {value['top']}, threshold: {comparator}")
+            log.info(f"Weather temperature = {temp}, operation: {value['operation']}, threshold: {comparator}")
             if eval(f"{temp} {operation} {comparator}") is False:
                 log.info(f"Condition is False  as temperature not {operation} threshold ({temp} !{operation} {comparator})")
                 return False

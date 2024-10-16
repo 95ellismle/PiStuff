@@ -135,6 +135,7 @@ class Scheduler:
                     should_run_job = next_job.condition_func()
                 except Exception as e:
                     log.info(f"Condition func {should_run_job} failed :( {str(e)}", exc_info=True)
+                    should_run_job = False
 
             if should_run_job:
                 next_job.job(*next_job.args, **kwargs)

@@ -28,15 +28,6 @@ schedule:
             operation: ">="
             value: 16
 
-    - name: 'both blinds partially down test'
-      job: 'both_blinds_down'
-      runtime: '10:48:00'
-      conditions:
-        - type: weather
-          temperature:
-            operation: ">="
-            value: 24
-
     - name: 'both blinds partially down high heat'
       job: 'both_blinds_down'
       runtime: '15:00:00'
